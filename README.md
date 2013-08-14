@@ -1,6 +1,6 @@
 Intrbiz Gerald
 ==============
-Gerald is a mole, living on your system, in your application, gathering metrics
+Gerald is a mole, on your system, in your application, gathering metrics.
 
 License
 -------
