@@ -1,0 +1,8 @@
+.project
+.classpath
+.settings/
+.directory
+target/
+*~
+/gerald-system-source/hyperic-sigar-1.6.4/
+/gerald-system-source/sigar.jar
