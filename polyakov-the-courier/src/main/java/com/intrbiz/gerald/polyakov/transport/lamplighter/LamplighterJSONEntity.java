@@ -1,19 +1,20 @@
-package com.intrbiz.gerald.polyakov.packager;
+package com.intrbiz.gerald.polyakov.transport.lamplighter;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.message.BasicHeader;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.intrbiz.gerald.polyakov.Packager;
 import com.intrbiz.gerald.polyakov.Parcel;
-import com.intrbiz.util.Option;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.Histogram;
@@ -23,106 +24,115 @@ import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.stats.Snapshot;
 
-public class JSONPackager implements Packager
+public class LamplighterJSONEntity implements HttpEntity
 {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ssZ");
+
+    private final Parcel parcel;
     
-    private final JsonFactory factory;
+    private final JsonFactory factory = new JsonFactory();
 
-    public JSONPackager()
+    public LamplighterJSONEntity(Parcel parcel)
     {
-        this.factory = new JsonFactory();
+        super();
+        this.parcel = parcel;
     }
 
     @Override
-    public void option(Option<String> option, String value)
+    public boolean isRepeatable()
     {
+        return true;
     }
 
     @Override
-    public void option(Option<Integer> option, int value)
+    public boolean isChunked()
     {
+        return true;
     }
 
     @Override
-    public void option(Option<Long> option, long value)
+    public long getContentLength()
     {
+        return -1;
     }
 
     @Override
-    public void option(Option<Float> option, float value)
+    public Header getContentType()
     {
+        return new BasicHeader("Content-Type", "application/json");
     }
 
     @Override
-    public void option(Option<Double> option, double value)
+    public Header getContentEncoding()
     {
+        return null;
     }
 
     @Override
-    public void option(Option<Boolean> option, boolean value)
+    public InputStream getContent() throws IOException, IllegalStateException
     {
+        return null;
     }
 
     @Override
-    public Parcel packageMetrics(Map<MetricName, Metric> metrics)
+    public void writeTo(OutputStream outstream) throws IOException
     {
-        Parcel p = new Parcel("json", "application/json");
+        JsonGenerator jg = this.factory.createGenerator(outstream);
+        jg.setPrettyPrinter(new DefaultPrettyPrinter());
+        jg.writeStartObject();
         //
-        try
+        jg.writeFieldName("class");
+        jg.writeString("com.intrbiz.lamplighter.model.Parcel");
+        // node
+        jg.writeFieldName("node");
+        jg.writeStartObject();
+        jg.writeFieldName("class");
+        jg.writeString("com.intrbiz.lamplighter.model.Node");
+        // host id
+        jg.writeFieldName("host-id");
+        jg.writeString(this.parcel.getNode().getHostId().toString());
+        // host name
+        jg.writeFieldName("host-name");
+        jg.writeString(this.parcel.getNode().getHostName());
+        // service
+        jg.writeFieldName("service");
+        jg.writeString(this.parcel.getNode().getService());
+        jg.writeEndObject();
+        //
+        jg.writeFieldName("time");
+        jg.writeString(DATE_FORMAT.format(new Date()));
+        //
+        jg.writeFieldName("metrics");
+        jg.writeStartArray();
+        for (Entry<MetricName, Metric> m : this.parcel.getMetrics().entrySet())
         {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-            try
-            {
-                JsonGenerator jg = this.factory.createGenerator(baos);
-                jg.setPrettyPrinter(new DefaultPrettyPrinter());
-                jg.writeStartObject();
-                //
-                jg.writeFieldName("class");
-                jg.writeString("com.intrbiz.lamplighter.model.Parcel");
-                //
-                jg.writeFieldName("time");
-                jg.writeString(DATE_FORMAT.format(new Date()));                
-                //
-                jg.writeFieldName("metrics");
-                jg.writeStartArray();
-                //
-                for (Entry<MetricName, Metric> m : metrics.entrySet())
-                {
-                    jg.writeStartObject();
-                    // the metric name
-                    jg.writeFieldName("name");
-                    jg.writeString(m.getKey().getGroup() + "." + m.getKey().getType() + "." + m.getKey().getName());
-                    // the metric scope
-                    jg.writeFieldName("scope");
-                    jg.writeString(m.getKey().getScope());
-                    //
-                    Metric mv = m.getValue();
-                    if (mv instanceof Gauge) this.writeGauge((Gauge<?>) mv, jg);
-                    else if (mv instanceof Counter) this.writeCounter((Counter) mv, jg);
-                    else if (mv instanceof Meter) this.writeMeter((Meter) mv, jg);
-                    else if (mv instanceof Timer) this.writeTimer((Timer) mv, jg);
-                    else if (mv instanceof Histogram) this.writeHistogram((Histogram) mv, jg);
-                    //
-                    jg.writeEndObject();
-                }
-                //
-                jg.writeEndArray();
-                //
-                jg.writeEndObject();
-                jg.close();
-            }
-            finally
-            {
-                baos.close();
-            }
-            p.buffer(ByteBuffer.wrap(baos.toByteArray()));
+            jg.writeStartObject();
+            // the metric name
+            jg.writeFieldName("name");
+            jg.writeString(m.getKey().getGroup() + "." + m.getKey().getType() + "." + m.getKey().getName());
+            // the metric scope
+            jg.writeFieldName("scope");
+            jg.writeString(m.getKey().getScope());
+            //
+            Metric mv = m.getValue();
+            if (mv instanceof Gauge)
+                this.writeGauge((Gauge<?>) mv, jg);
+            else if (mv instanceof Counter)
+                this.writeCounter((Counter) mv, jg);
+            else if (mv instanceof Meter)
+                this.writeMeter((Meter) mv, jg);
+            else if (mv instanceof Timer)
+                this.writeTimer((Timer) mv, jg);
+            else if (mv instanceof Histogram) this.writeHistogram((Histogram) mv, jg);
+            //
+            jg.writeEndObject();
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return p;
+        jg.writeEndArray();
+        jg.writeEndObject();
+        //
+        jg.flush();
+        // close?
+        jg.close();
     }
 
     protected void writeCounter(Counter c, JsonGenerator jg) throws IOException
@@ -133,7 +143,7 @@ public class JSONPackager implements Packager
         jg.writeFieldName("class");
         jg.writeString("com.intrbiz.lamplighter.model.CounterReading");
     }
-    
+
     protected void writeMeter(Meter m, JsonGenerator jg) throws IOException
     {
         jg.writeFieldName("count");
@@ -157,7 +167,7 @@ public class JSONPackager implements Packager
         jg.writeFieldName("class");
         jg.writeString("com.intrbiz.lamplighter.model.MeterReading");
     }
-    
+
     protected void writeTimer(Timer t, JsonGenerator jg) throws IOException
     {
         jg.writeFieldName("count");
@@ -228,7 +238,7 @@ public class JSONPackager implements Packager
         jg.writeFieldName("class");
         jg.writeString("com.intrbiz.lamplighter.model.TimerReading");
     }
-    
+
     protected void writeHistogram(Histogram h, JsonGenerator jg) throws IOException
     {
         jg.writeFieldName("count");
@@ -278,7 +288,7 @@ public class JSONPackager implements Packager
         jg.writeFieldName("class");
         jg.writeString("com.intrbiz.lamplighter.model.HistogramReading");
     }
-    
+
     protected void writeGauge(Gauge<?> g, JsonGenerator jg) throws IOException
     {
         Object val = g.value();
@@ -335,5 +345,17 @@ public class JSONPackager implements Packager
         //
         jg.writeFieldName("class");
         jg.writeString("com.intrbiz.lamplighter.model.GaugeReading");
+    }
+
+    @Override
+    public boolean isStreaming()
+    {
+        return true;
+    }
+
+    @Override
+    @Deprecated
+    public void consumeContent() throws IOException
+    {
     }
 }

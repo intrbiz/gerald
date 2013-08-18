@@ -3,15 +3,13 @@ package com.intrbiz.gerald;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.gerald.polyakov.MetricFilter;
-import com.intrbiz.gerald.polyakov.Packager;
+import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.gerald.polyakov.Polyakov;
-import com.intrbiz.gerald.polyakov.PolyakovKey;
 import com.intrbiz.gerald.polyakov.Transport;
 import com.intrbiz.util.Option;
 import com.yammer.metrics.Metrics;
@@ -71,6 +69,12 @@ public final class Gerald
         return this;
     }
     
+    public Gerald from(Node node)
+    {
+        this.courier.from(node);
+        return this;
+    }
+    
     public Gerald courierTo(String url)
     {
         courier.courierTo(url);
@@ -89,75 +93,21 @@ public final class Gerald
         return this;
     }
 
-    public Gerald packager(Packager p)
-    {
-        courier.packager(p);
-        return this;
-    }
-
-    public Gerald json()
-    {
-        courier.json();
-        return this;
-    }
-
-    public Gerald packagerOption(Option<String> option, String value)
-    {
-        courier.packagerOption(option, value);
-        return this;
-    }
-
-    public Gerald packagerOption(Option<Integer> option, int value)
-    {
-        courier.packagerOption(option, value);
-        return this;
-    }
-
-    public Gerald packagerOption(Option<Long> option, long value)
-    {
-        courier.packagerOption(option, value);
-        return this;
-    }
-
-    public Gerald packagerOption(Option<Float> option, float value)
-    {
-        courier.packagerOption(option, value);
-        return this;
-    }
-
-    public Gerald packagerOption(Option<Double> option, double value)
-    {
-        courier.packagerOption(option, value);
-        return this;
-    }
-
-    public Gerald packagerOption(Option<Boolean> option, boolean value)
-    {
-        courier.packagerOption(option, value);
-        return this;
-    }
-
     public Gerald transport(Transport t)
     {
         courier.transport(t);
         return this;
     }
-
-    public Gerald http()
+    
+    public Gerald lamplighter()
     {
-        courier.http();
+        this.courier.lamplighter();
         return this;
     }
-
-    public Gerald from(UUID id, String name, String service)
+    
+    public Gerald lamplighter(String lamplighterKey)
     {
-        courier.from(id, name, service);
-        return this;
-    }
-
-    public Gerald key(PolyakovKey key)
-    {
-        courier.key(key);
+        this.courier.lamplighter(lamplighterKey);
         return this;
     }
 

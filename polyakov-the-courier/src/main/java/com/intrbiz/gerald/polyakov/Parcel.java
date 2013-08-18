@@ -1,51 +1,51 @@
 package com.intrbiz.gerald.polyakov;
 
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+
 
 public class Parcel
-{   
-    private final String format;
+{
+    private Node node;
     
-    private final String contentType;
+    private Map<MetricName,Metric> metrics = new HashMap<MetricName,Metric>();
     
-    private List<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
-    
-    public Parcel(String format, String contentType)
+    public Parcel()
     {
         super();
-        this.format = format;
-        this.contentType = contentType;
     }
     
-    public String getFormat()
+    public Parcel(Node node)
     {
-        return this.format;
+        this();
+        this.node = node;
+    }
+
+    public Node getNode()
+    {
+        return node;
+    }
+
+    public void setNode(Node node)
+    {
+        this.node = node;
+    }
+
+    public Map<MetricName, Metric> getMetrics()
+    {
+        return metrics;
+    }
+
+    public void setMetrics(Map<MetricName, Metric> metrics)
+    {
+        this.metrics = metrics;
     }
     
-    public String getContentType()
+    public void addMetric(MetricName name, Metric metric)
     {
-        return this.contentType;
-    }
-    
-    public void buffer(ByteBuffer buffer)
-    {
-        this.buffers.add(buffer);
-    }
-    
-    public List<ByteBuffer> buffers()
-    {
-        return this.buffers;
-    }
-    
-    public long getContentLength()
-    {
-        long l = 0;
-        for (ByteBuffer buffer : this.buffers)
-        {
-            l += buffer.limit();
-        }
-        return l;
+        this.metrics.put(name, metric);
     }
 }

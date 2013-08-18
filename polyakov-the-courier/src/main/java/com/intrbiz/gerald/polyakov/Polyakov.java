@@ -1,19 +1,15 @@
 package com.intrbiz.gerald.polyakov;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.gerald.polyakov.packager.JSONPackager;
-import com.intrbiz.gerald.polyakov.transport.HTTPTransport;
+import com.intrbiz.gerald.polyakov.transport.LamplighterTransport;
 import com.intrbiz.util.Option;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
@@ -31,9 +27,9 @@ public class Polyakov implements Runnable
 
     protected List<MetricFilter> filters = new ArrayList<MetricFilter>();
 
-    protected Packager packager;
-
     protected Transport transport;
+    
+    protected Node node;
 
     protected Thread runner;
 
@@ -49,6 +45,12 @@ public class Polyakov implements Runnable
     {
         super();
     }
+    
+    public Polyakov from(Node node)
+    {
+        this.node = node;
+        return this;
+    }
 
     public Polyakov registry(MetricsRegistry reg)
     {
@@ -62,75 +64,28 @@ public class Polyakov implements Runnable
         return this;
     }
 
-    public Polyakov packager(Packager p)
-    {
-        this.packager = p;
-        return this;
-    }
-    
-    public Polyakov json()
-    {
-        return this.packager(new JSONPackager());
-    }
-
-    public Polyakov packagerOption(Option<String> option, String value)
-    {
-        this.packager.option(option, value);
-        return this;
-    }
-
-    public Polyakov packagerOption(Option<Integer> option, int value)
-    {
-        this.packager.option(option, value);
-        return this;
-    }
-
-    public Polyakov packagerOption(Option<Long> option, long value)
-    {
-        this.packager.option(option, value);
-        return this;
-    }
-
-    public Polyakov packagerOption(Option<Float> option, float value)
-    {
-        this.packager.option(option, value);
-        return this;
-    }
-
-    public Polyakov packagerOption(Option<Double> option, double value)
-    {
-        this.packager.option(option, value);
-        return this;
-    }
-
-    public Polyakov packagerOption(Option<Boolean> option, boolean value)
-    {
-        this.packager.option(option, value);
-        return this;
-    }
-
     public Polyakov transport(Transport t)
     {
         this.transport = t;
         return this;
     }
     
-    public Polyakov http()
-    {
-        return this.transport(new HTTPTransport());
-    }
+    // out the box transports
     
-    public Polyakov from(UUID id, String name, String service)
+    public Polyakov lamplighter()
     {
-        this.transport.node(id, name, service);
+        this.transport = new LamplighterTransport();
         return this;
     }
     
-    public Polyakov key(PolyakovKey key)
+    public Polyakov lamplighter(String lamplighterKey)
     {
-        this.transport.key(key);
+        this.transport = new LamplighterTransport();
+        this.transport.option(LamplighterTransport.LAMPLIGHTER_KEY, lamplighterKey);
         return this;
     }
+    
+    //
 
     public Polyakov courierTo(String url)
     {
@@ -183,7 +138,7 @@ public class Polyakov implements Runnable
     public void start()
     {
         // sanity checks
-        if (this.packager == null) throw new RuntimeException("Polyakov needs a packager");
+        if (this.node == null) throw new RuntimeException("Polyakov needs an identity");
         if (this.transport == null) throw new RuntimeException("Polyakov needs a transport");
         // start
         synchronized (this)
@@ -234,16 +189,14 @@ public class Polyakov implements Runnable
     {
         logger.trace("Couriering Metrics");
         // select the metrics to send
-        Map<MetricName,Metric> metrics = this.revealMetrics();
-        // package the metrics
-        Parcel p = this.packager.packageMetrics(metrics);
+        Parcel metrics = this.parcelMetrics();
         // courier the metrics
-        this.transport.courier(p);
+        this.transport.courier(metrics);
     }
     
-    protected Map<MetricName,Metric> revealMetrics()
+    protected Parcel parcelMetrics()
     {
-        Map<MetricName,Metric> metrics = new HashMap<MetricName,Metric>();
+        Parcel metrics = new Parcel(this.node);
         for (MetricsRegistry reg : this.registries)
         {
             for (Entry<MetricName,Metric> m : reg.allMetrics().entrySet())
@@ -251,7 +204,7 @@ public class Polyakov implements Runnable
                 if (this.revealMetric(m))
                 {
                     logger.trace("Revealing: " + m.getKey().toString());
-                    metrics.put(m.getKey(), m.getValue());
+                    metrics.addMetric(m.getKey(), m.getValue());
                 }
             }
         }

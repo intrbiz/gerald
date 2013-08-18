@@ -1,7 +1,5 @@
 package com.intrbiz.gerald.polyakov;
 
-import java.util.UUID;
-
 import com.intrbiz.util.Optioned;
 
 /**
@@ -10,10 +8,6 @@ import com.intrbiz.util.Optioned;
 public interface Transport extends Optioned
 {
     void to(String url);
-    
-    void node(UUID id, String name, String service);
-    
-    void key(PolyakovKey key);
     
     void courier(Parcel parcel);
 }
