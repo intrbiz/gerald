@@ -4,11 +4,11 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-public class HostNameSource extends InteligenceSource
+public class HostNameSource extends AbstractIntelligenceSource
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
     
@@ -18,16 +18,16 @@ public class HostNameSource extends InteligenceSource
     }
 
     @Override
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
-        registry.newGauge(HostNameSource.class, "hostname", this.hostNameGague());
+        registry.register(Witchcraft.name(HostNameSource.class, "hostname"), this.hostNameGague());
     }
     
     protected Gauge<String> hostNameGague()
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {

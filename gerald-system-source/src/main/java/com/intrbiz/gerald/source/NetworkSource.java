@@ -6,11 +6,11 @@ import org.hyperic.sigar.NetStat;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-public class NetworkSource extends InteligenceSource
+public class NetworkSource extends AbstractIntelligenceSource
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
     
@@ -20,23 +20,23 @@ public class NetworkSource extends InteligenceSource
     }
 
     @Override
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
-        registry.newGauge(NetworkSource.class, "default-gateway", this.defaultGatewayGague());
-        registry.newGauge(NetworkSource.class, "domain-name", this.domainNameGague());
-        registry.newGauge(NetworkSource.class, "host-name", this.hostNameGague());
-        registry.newGauge(NetworkSource.class, "primary-dns", this.primaryDNSGague());
-        registry.newGauge(NetworkSource.class, "secondary-dns", this.secondaryGatewayGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "default-gateway"), this.defaultGatewayGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "domain-name"), this.domainNameGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "host-name"), this.hostNameGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "primary-dns"), this.primaryDNSGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "secondary-dns"), this.secondaryGatewayGague());
         //
-        registry.newGauge(NetworkSource.class, "all-inbound-traffic", this.allInboundTotalGague());
-        registry.newGauge(NetworkSource.class, "all-outbound-traffic", this.allOutboundTotalGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "all-inbound-traffic"), this.allInboundTotalGague());
+        registry.register(Witchcraft.name(NetworkSource.class, "all-outbound-traffic"), this.allOutboundTotalGague());
     }
     
     protected Gauge<String> defaultGatewayGague()
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -55,7 +55,7 @@ public class NetworkSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -74,7 +74,7 @@ public class NetworkSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -93,7 +93,7 @@ public class NetworkSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -112,7 +112,7 @@ public class NetworkSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -131,7 +131,7 @@ public class NetworkSource extends InteligenceSource
     {
         return new Gauge<Integer>() {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 try
                 {
@@ -150,7 +150,7 @@ public class NetworkSource extends InteligenceSource
     {
         return new Gauge<Integer>() {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 try
                 {

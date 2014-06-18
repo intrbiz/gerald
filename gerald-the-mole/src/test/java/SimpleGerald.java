@@ -15,13 +15,13 @@ public class SimpleGerald
     {
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
-        //
+        // setup Gerald to report
         Gerald.theMole()
             .source(new JVMSource())
             .lamplighter()
             .from(Node.service("SimpleGerald"))
-            .period(5, TimeUnit.SECONDS)
-            .courierTo("http://hub.lampl.it/receive")
+            .period(5, TimeUnit.MINUTES)
+            .courierTo("http://hub.lamplighter/receive")
             .start();
     }
 }

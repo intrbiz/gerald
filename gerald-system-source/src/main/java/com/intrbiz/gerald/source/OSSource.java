@@ -2,11 +2,11 @@ package com.intrbiz.gerald.source;
 
 import org.hyperic.sigar.OperatingSystem;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-public class OSSource extends InteligenceSource
+public class OSSource extends AbstractIntelligenceSource
 {
     public OSSource()
     {
@@ -14,18 +14,18 @@ public class OSSource extends InteligenceSource
     }
 
     @Override
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
-        registry.newGauge(OSSource.class, "os-arch", this.archGague());
-        registry.newGauge(OSSource.class, "os-name", this.nameGague());
-        registry.newGauge(OSSource.class, "os-description", this.descriptionGague());
-        registry.newGauge(OSSource.class, "os-machine", this.machineGague());
-        registry.newGauge(OSSource.class, "os-version", this.versionGague());
-        registry.newGauge(OSSource.class, "os-patchlevel", this.patchLevelGague());
-        registry.newGauge(OSSource.class, "os-vendor", this.vendorGague());
-        registry.newGauge(OSSource.class, "os-vendor-name", this.vendorNameGague());
-        registry.newGauge(OSSource.class, "os-vendor-code-name", this.vendorCodeNameGague());
-        registry.newGauge(OSSource.class, "os-vendor-version", this.vendorVersionGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-arch"), this.archGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-name"), this.nameGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-description"), this.descriptionGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-machine"), this.machineGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-version"), this.versionGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-patchlevel"), this.patchLevelGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-vendor"), this.vendorGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-vendor-name"), this.vendorNameGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-vendor-code-name"), this.vendorCodeNameGague());
+        registry.register(Witchcraft.name(OSSource.class, "os-vendor-version"), this.vendorVersionGague());
     }
 
     protected Gauge<String> archGague()
@@ -33,7 +33,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getArch();
@@ -46,7 +46,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getMachine();
@@ -59,7 +59,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getName();
@@ -72,7 +72,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getDescription();
@@ -85,7 +85,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getVendor();
@@ -98,7 +98,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getVendorName();
@@ -111,7 +111,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getVendorCodeName();
@@ -124,7 +124,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getVendorVersion();
@@ -137,7 +137,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getVersion();
@@ -150,7 +150,7 @@ public class OSSource extends InteligenceSource
         return new Gauge<String>()
         {
             @Override
-            public String value()
+            public String getValue()
             {
                 OperatingSystem sys = OperatingSystem.getInstance();
                 return sys.getPatchLevel();

@@ -6,11 +6,11 @@ import org.hyperic.sigar.NetInterfaceStat;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-public class InterfaceSource extends InteligenceSource
+public class InterfaceSource extends AbstractIntelligenceSource
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
     
@@ -20,19 +20,19 @@ public class InterfaceSource extends InteligenceSource
     }
 
     @Override
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
         try
         {
             for (String iface : sigar.getNetInterfaceList())
             {
-                registry.newGauge(InterfaceSource.class, "hardware-address", iface, this.hwAddressGague(iface));
-                registry.newGauge(InterfaceSource.class, "address", iface, this.addressGague(iface));
-                registry.newGauge(InterfaceSource.class, "netmask", iface, this.netmaskGague(iface));
-                registry.newGauge(InterfaceSource.class, "type", iface, this.typeGague(iface));
+                registry.register(Witchcraft.name(InterfaceSource.class, "hardware-address", iface), this.hwAddressGague(iface));
+                registry.register(Witchcraft.name(InterfaceSource.class, "address", iface), this.addressGague(iface));
+                registry.register(Witchcraft.name(InterfaceSource.class, "netmask", iface), this.netmaskGague(iface));
+                registry.register(Witchcraft.name(InterfaceSource.class, "type", iface), this.typeGague(iface));
                 //
-                registry.newGauge(InterfaceSource.class, "tx-bytes", iface, this.txBytesGague(iface));
-                registry.newGauge(InterfaceSource.class, "rx-bytes", iface, this.rxBytesGague(iface));
+                registry.register(Witchcraft.name(InterfaceSource.class, "tx-bytes", iface), this.txBytesGague(iface));
+                registry.register(Witchcraft.name(InterfaceSource.class, "rx-bytes", iface), this.rxBytesGague(iface));
             }
         }
         catch (SigarException e)
@@ -44,7 +44,7 @@ public class InterfaceSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -63,7 +63,7 @@ public class InterfaceSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -82,7 +82,7 @@ public class InterfaceSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -101,7 +101,7 @@ public class InterfaceSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -120,7 +120,7 @@ public class InterfaceSource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -139,7 +139,7 @@ public class InterfaceSource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {

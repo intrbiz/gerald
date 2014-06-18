@@ -4,15 +4,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
-import com.intrbiz.gerald.InteligenceSource;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.source.AbstractIntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.pinger.Pinger;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
 
 /**
  * A server to ping hosts and monitor their availability
  */
-public class PingSource extends InteligenceSource implements Runnable
+public class PingSource extends AbstractIntelligenceSource implements Runnable
 {    
     private Pinger<PingSourceTarget> pinger;
 
@@ -30,50 +31,50 @@ public class PingSource extends InteligenceSource implements Runnable
     }
 
     @Override
-    protected void register(MetricsRegistry registry)
+    protected void register(MetricRegistry registry)
     {
-        registry.newGauge(PingSource.class, "pinger-version", new Gauge<String>(){
+        registry.register(Witchcraft.name(PingSource.class, "pinger-version"), new Gauge<String>(){
             @Override
-            public String value()
+            public String getValue()
             {
                 return "1.0.0";
             }
         });
         //
-        registry.newGauge(PingSource.class, "pinger-total-sent", new Gauge<Integer>(){
+        registry.register(Witchcraft.name(PingSource.class, "pinger-total-sent"), new Gauge<Integer>(){
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 return pinger.getTotalSent();
             }
         });
         //
-        registry.newGauge(PingSource.class, "pinger-total-recv", new Gauge<Integer>(){
+        registry.register(Witchcraft.name(PingSource.class, "pinger-total-recv"), new Gauge<Integer>(){
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 return pinger.getTotalRecv();
             }
         });
         //
-        registry.newGauge(PingSource.class, "pinger-send-rate", new Gauge<Double>(){
+        registry.register(Witchcraft.name(PingSource.class, "pinger-send-rate"), new Gauge<Double>(){
             @Override
-            public Double value()
+            public Double getValue()
             {
                 return pinger.getSendRate();
             }
         });
         //
-        registry.newGauge(PingSource.class, "pinger-recv-rate", new Gauge<Double>(){
+        registry.register(Witchcraft.name(PingSource.class, "pinger-recv-rate"), new Gauge<Double>(){
             @Override
-            public Double value()
+            public Double getValue()
             {
                 return pinger.getRecvRate();
             }
         });
     }
     
-    protected void doStart()
+    public void start()
     {
         this.pingThread.start();        
     }

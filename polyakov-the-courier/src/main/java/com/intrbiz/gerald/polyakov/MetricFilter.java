@@ -1,6 +1,5 @@
 package com.intrbiz.gerald.polyakov;
 
-import com.yammer.metrics.core.MetricName;
 
 public interface MetricFilter
 {
@@ -9,7 +8,7 @@ public interface MetricFilter
      * @param name
      * @return
      */
-    boolean match(MetricName name);
+    boolean match(String name);
     
     /**
      * Should Polyakov reveal the matched metrics?

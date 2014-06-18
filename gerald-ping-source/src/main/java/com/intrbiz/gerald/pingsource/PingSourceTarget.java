@@ -3,10 +3,11 @@ package com.intrbiz.gerald.pingsource;
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.pinger.PingTarget;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
 
 public class PingSourceTarget extends PingTarget
 {
@@ -20,31 +21,31 @@ public class PingSourceTarget extends PingTarget
 
     private final Gauge<Integer> timeoutsGauge;
 
-    public PingSourceTarget(MetricsRegistry registry, String name, InetAddress address)
+    public PingSourceTarget(MetricRegistry registry, String name, InetAddress address)
     {
         super(name, address);
         //
-        this.latencyTimer = registry.newTimer(PingSource.class, "latency", this.getName(), TimeUnit.MICROSECONDS, TimeUnit.MINUTES);
-        this.isUpGauge = registry.newGauge(PingSource.class, "isUp", this.getName(), new Gauge<Boolean>()
+        this.latencyTimer = registry.timer(Witchcraft.name(PingSource.class, "latency", this.getName()));
+        this.isUpGauge = registry.register(Witchcraft.name(PingSource.class, "isUp", this.getName()), new Gauge<Boolean>()
         {
             @Override
-            public Boolean value()
+            public Boolean getValue()
             {
                 return isUp();
             }
         });
-        this.pingsGauge = registry.newGauge(PingSource.class, "pings", this.getName(), new Gauge<Integer>()
+        this.pingsGauge = registry.register(Witchcraft.name(PingSource.class, "pings", this.getName()), new Gauge<Integer>()
         {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 return getSentCount();
             }
         });
-        this.timeoutsGauge = registry.newGauge(PingSource.class, "timeouts", this.getName(), new Gauge<Integer>()
+        this.timeoutsGauge = registry.register(Witchcraft.name(PingSource.class, "timeouts", this.getName()), new Gauge<Integer>()
         {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 return getDroppedCount();
             }
@@ -76,12 +77,12 @@ public class PingSourceTarget extends PingTarget
         return timeoutsGauge;
     }
     
-    public void close(MetricsRegistry registry)
+    public void close(MetricRegistry registry)
     {
-        registry.removeMetric(PingSource.class, "latency", this.getName());
-        registry.removeMetric(PingSource.class, "isUp", this.getName());
-        registry.removeMetric(PingSource.class, "pings", this.getName());
-        registry.removeMetric(PingSource.class, "timeouts", this.getName());
+        registry.remove(Witchcraft.name(PingSource.class, "latency", this.getName()));
+        registry.remove(Witchcraft.name(PingSource.class, "isUp", this.getName()));
+        registry.remove(Witchcraft.name(PingSource.class, "pings", this.getName()));
+        registry.remove(Witchcraft.name(PingSource.class, "timeouts", this.getName()));
     }
 
     @Override

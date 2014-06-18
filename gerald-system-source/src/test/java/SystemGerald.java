@@ -15,7 +15,6 @@ import com.intrbiz.gerald.source.MemorySource;
 import com.intrbiz.gerald.source.NetworkSource;
 import com.intrbiz.gerald.source.OSSource;
 import com.intrbiz.gerald.source.UptimeSource;
-import com.intrbiz.gerald.sources.JVMSource;
 
 public class SystemGerald
 {
@@ -25,7 +24,6 @@ public class SystemGerald
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
         Gerald.theMole()
-            .source(new JVMSource())
             .source(new CPUSource())
             .source(new MemorySource())
             .source(new HostNameSource())
@@ -36,8 +34,8 @@ public class SystemGerald
             .source(new InterfaceSource())
             .lamplighter()
             .from(Node.systemService())
-            .period(5, TimeUnit.SECONDS)
-            .courierTo("http://hub.lampl.it/receive")
+            .period(30, TimeUnit.SECONDS)
+            .courierTo("http://hub.lamplighter/receive")
             .start();
     }
 }

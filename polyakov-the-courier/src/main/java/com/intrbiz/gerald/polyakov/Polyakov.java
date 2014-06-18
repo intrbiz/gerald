@@ -9,11 +9,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Metric;
 import com.intrbiz.gerald.polyakov.transport.LamplighterTransport;
+import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.util.Option;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsRegistry;
 
 /**
  * Polyakov the courier.
@@ -23,7 +22,7 @@ import com.yammer.metrics.core.MetricsRegistry;
  */
 public class Polyakov implements Runnable
 {
-    protected Set<MetricsRegistry> registries = new HashSet<MetricsRegistry>();
+    protected Set<IntelligenceSource> sources = new HashSet<IntelligenceSource>();
 
     protected List<MetricFilter> filters = new ArrayList<MetricFilter>();
 
@@ -52,9 +51,9 @@ public class Polyakov implements Runnable
         return this;
     }
 
-    public Polyakov registry(MetricsRegistry reg)
+    public Polyakov source(IntelligenceSource source)
     {
-        this.registries.add(reg);
+        this.sources.add(source);
         return this;
     }
 
@@ -187,35 +186,33 @@ public class Polyakov implements Runnable
 
     protected void courierMetrics()
     {
-        logger.trace("Couriering Metrics");
-        // select the metrics to send
-        Parcel metrics = this.parcelMetrics();
-        // courier the metrics
-        this.transport.courier(metrics);
+        logger.debug("Couriering Metrics");
+        // parcel up and send our sources
+        for (IntelligenceSource source : this.sources)
+        {
+            this.transport.courier(this.parcelUp(source));
+        }
     }
     
-    protected Parcel parcelMetrics()
+    protected Parcel parcelUp(IntelligenceSource source)
     {
-        Parcel metrics = new Parcel(this.node);
-        for (MetricsRegistry reg : this.registries)
+        Parcel metrics = new Parcel(this.node, source.getName());
+        for (Entry<String,Metric> m : source.getRegistry().getMetrics().entrySet())
         {
-            for (Entry<MetricName,Metric> m : reg.allMetrics().entrySet())
+            if (this.revealMetric(m))
             {
-                if (this.revealMetric(m))
-                {
-                    logger.trace("Revealing: " + m.getKey().toString());
-                    metrics.addMetric(m.getKey(), m.getValue());
-                }
+                if (logger.isTraceEnabled()) logger.trace("Revealing: " + m.getKey().toString());
+                metrics.addMetric(m.getKey(), m.getValue());
             }
         }
         return metrics;
     }
     
-    protected boolean revealMetric(Entry<MetricName,Metric> m)
+    protected boolean revealMetric(Entry<String,Metric> m)
     {
         for (MetricFilter filter : this.filters)
         {
-            logger.trace("Applying filter: " + filter.toString());
+            if (logger.isTraceEnabled()) logger.trace("Applying filter: " + filter.toString());
             if (filter.match(m.getKey()))
             {
                 return filter.reveal();
@@ -241,7 +238,7 @@ public class Polyakov implements Runnable
             {
             }
             waitTime -= (System.currentTimeMillis() - sleepTime);
-            logger.trace("Waited: " + (System.currentTimeMillis() - sleepTime) + " " + waitTime);
+            if (logger.isTraceEnabled()) logger.trace("Waited: " + (System.currentTimeMillis() - sleepTime) + " " + waitTime);
         }
         while (waitTime > 0 && (!this.sendNow));
     }

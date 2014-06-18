@@ -7,11 +7,11 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-public final class CPUSource extends InteligenceSource
+public final class CPUSource extends AbstractIntelligenceSource
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
     
@@ -21,35 +21,35 @@ public final class CPUSource extends InteligenceSource
     }
 
     @Override
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
         // CPU Info
-        registry.newGauge(CPUSource.class, "cpu-vendor", this.cpuVendorGague());
-        registry.newGauge(CPUSource.class, "cpu-model", this.cpuModelGague());
-        registry.newGauge(CPUSource.class, "cpu-sockets", this.cpuSocketsGague());
-        registry.newGauge(CPUSource.class, "cpu-cores", this.cpuCoresGague());
-        registry.newGauge(CPUSource.class, "cpu-frequency", this.cpuFrequencyGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-vendor"), this.cpuVendorGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-model"), this.cpuModelGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-sockets"), this.cpuSocketsGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-cores"), this.cpuCoresGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-frequency"), this.cpuFrequencyGague());
         // Load
-        registry.newGauge(CPUSource.class, "load-one-minute-average", this.oneMinLoadGague());
-        registry.newGauge(CPUSource.class, "load-five-minute-average", this.fiveMinLoadGague());
-        registry.newGauge(CPUSource.class, "load-fifteen-minute-average", this.fifteenMinLoadGague());
+        registry.register(Witchcraft.name(CPUSource.class, "load-one-minute-average"), this.oneMinLoadGague());
+        registry.register(Witchcraft.name(CPUSource.class, "load-five-minute-average"), this.fiveMinLoadGague());
+        registry.register(Witchcraft.name(CPUSource.class, "load-fifteen-minute-average"), this.fifteenMinLoadGague());
         // CPU Time
-        registry.newGauge(CPUSource.class, "cpu-total-time", this.cpuTotalTimeGague());
-        registry.newGauge(CPUSource.class, "cpu-system-time", this.cpuSystemTimeGague());
-        registry.newGauge(CPUSource.class, "cpu-user-time", this.cpuUserTimeGague());
-        registry.newGauge(CPUSource.class, "cpu-wait-time", this.cpuWaitTimeGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-total-time"), this.cpuTotalTimeGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-system-time"), this.cpuSystemTimeGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-user-time"), this.cpuUserTimeGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-wait-time"), this.cpuWaitTimeGague());
         // CPU Usage
-        registry.newGauge(CPUSource.class, "cpu-total-usage", this.cpuTotalUsageGague());
-        registry.newGauge(CPUSource.class, "cpu-system-usage", this.cpuSystemUsageGague());
-        registry.newGauge(CPUSource.class, "cpu-user-usage", this.cpuUserUsageGague());
-        registry.newGauge(CPUSource.class, "cpu-wait-usage", this.cpuWaitUsageGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-total-usage"), this.cpuTotalUsageGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-system-usage"), this.cpuSystemUsageGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-user-usage"), this.cpuUserUsageGague());
+        registry.register(Witchcraft.name(CPUSource.class, "cpu-wait-usage"), this.cpuWaitUsageGague());
     }
     
     protected Gauge<Double> cpuTotalUsageGague()
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -68,7 +68,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -87,7 +87,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -106,7 +106,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -125,7 +125,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -144,7 +144,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -163,7 +163,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -182,7 +182,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -201,7 +201,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Integer>() {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 try
                 {
@@ -220,7 +220,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Integer>() {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 try
                 {
@@ -239,7 +239,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Integer>() {
             @Override
-            public Integer value()
+            public Integer getValue()
             {
                 try
                 {
@@ -258,7 +258,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -277,7 +277,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<String>() {
             @Override
-            public String value()
+            public String getValue()
             {
                 try
                 {
@@ -296,7 +296,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -315,7 +315,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -334,7 +334,7 @@ public final class CPUSource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {

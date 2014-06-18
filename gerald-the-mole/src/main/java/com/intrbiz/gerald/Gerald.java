@@ -1,19 +1,14 @@
 package com.intrbiz.gerald;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.gerald.polyakov.MetricFilter;
 import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.gerald.polyakov.Polyakov;
 import com.intrbiz.gerald.polyakov.Transport;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.util.Option;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
 
 /**
  * Gerald the mole!
@@ -30,43 +25,25 @@ public final class Gerald
         return theMole;
     }
     
-    protected final ConcurrentMap<String,InteligenceSource> sources = new ConcurrentHashMap<String, InteligenceSource>();
+    protected final Witchcraft witchcraft;
     
-    protected final Polyakov courier = new Polyakov();
+    protected final Polyakov courier;
     
     protected volatile boolean started = false;
     
     private Gerald()
     {
         super();
-        // register the default registry with polyakov
-        this.courier.registry(Metrics.defaultRegistry());
-    }
-    
-    /**
-     * Add an inteligence source for Gerald to expose
-     * @param source
-     * @return
-     */
-    public Gerald source(InteligenceSource source)
-    {
-        if (source == null) throw new IllegalArgumentException("Cannot register a null intelligence source");
-        if (this.started) 
+        this.courier = new Polyakov();
+        this.witchcraft = Witchcraft.get();
+        this.witchcraft.addRegisterListener((src) ->
         {
-            if (! this.sources.containsKey(source.getName()))
+            if (started)
             {
-                this.sources.put(source.getName(), source);
-                //
-                MetricsRegistry reg = source.register();
-                this.courier.registry(reg);
-                source.start();
+                courier.source(src);
+                src.start();
             }
-        }
-        else
-        {
-            this.sources.put(source.getName(), source);
-        }
-        return this;
+        });
     }
     
     public Gerald from(Node node)
@@ -78,12 +55,6 @@ public final class Gerald
     public Gerald courierTo(String url)
     {
         courier.courierTo(url);
-        return this;
-    }
-
-    public Gerald registry(MetricsRegistry reg)
-    {
-        courier.registry(reg);
         return this;
     }
 
@@ -152,42 +123,32 @@ public final class Gerald
         courier.period(period, unit);
         return this;
     }
+    
+    public Witchcraft witchcraft()
+    {
+        return this.witchcraft;
+    }
+    
+    public Gerald source(IntelligenceSource source)
+    {
+        this.witchcraft.register(source);
+        return this;
+    }
 
     /**
-     * Make Gerald start digging
+     * Tell Gerald to start digging
      */
     public synchronized void start()
     {
         if (this.courier == null) throw new RuntimeException("Gerald needs a courier to handle him!");
         // start the sources
-        for (InteligenceSource src : this.sources.values())
+        for (IntelligenceSource src : this.witchcraft.getSources())
         {
-            MetricsRegistry reg = src.register();
-            this.courier.registry(reg);
+            this.courier.source(src);
             src.start();
         }
         // start Polyakov the Courier to dispatch the metrics
         this.courier.start();
         this.started = true;
-    }
-    
-    public InteligenceSource getSource(String name)
-    {
-        return this.sources.get(name);
-    }
-    
-    public boolean containsSource(String name)
-    {
-        return this.sources.containsKey(name);
-    }
-    
-    public Set<String> getSourceNames()
-    {
-        return Collections.unmodifiableSet(this.sources.keySet());
-    }
-    
-    public Collection<InteligenceSource> getSources()
-    {
-        return Collections.unmodifiableCollection(this.sources.values());
     }
 }

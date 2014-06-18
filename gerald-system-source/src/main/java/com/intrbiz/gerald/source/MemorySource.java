@@ -5,11 +5,11 @@ import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-public final class MemorySource extends InteligenceSource
+public final class MemorySource extends AbstractIntelligenceSource
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
     
@@ -19,26 +19,26 @@ public final class MemorySource extends InteligenceSource
     }
 
     @Override
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
         // The amount of RAM
-        registry.newGauge(MemorySource.class, "ram", this.ramGague());
+        registry.register(Witchcraft.name(MemorySource.class, "ram"), this.ramGague());
         // Usage
-        registry.newGauge(MemorySource.class, "total-memory", this.totalGague());
-        registry.newGauge(MemorySource.class, "used-memory", this.usedGague());
-        registry.newGauge(MemorySource.class, "free-memory", this.freeGague());
-        registry.newGauge(MemorySource.class, "actual-used-memory", this.actualUsedGague());
-        registry.newGauge(MemorySource.class, "actual-free-memory", this.actualFreeGague());
+        registry.register(Witchcraft.name(MemorySource.class, "total-memory"), this.totalGague());
+        registry.register(Witchcraft.name(MemorySource.class, "used-memory"), this.usedGague());
+        registry.register(Witchcraft.name(MemorySource.class, "free-memory"), this.freeGague());
+        registry.register(Witchcraft.name(MemorySource.class, "actual-used-memory"), this.actualUsedGague());
+        registry.register(Witchcraft.name(MemorySource.class, "actual-free-memory"), this.actualFreeGague());
         // Usage percentage
-        registry.newGauge(MemorySource.class, "used-memory-percent", this.usedPercentGague());
-        registry.newGauge(MemorySource.class, "free-memory-percent", this.freePercentGague());
+        registry.register(Witchcraft.name(MemorySource.class, "used-memory-percent"), this.usedPercentGague());
+        registry.register(Witchcraft.name(MemorySource.class, "free-memory-percent"), this.freePercentGague());
     }
     
     protected Gauge<Long> ramGague()
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -57,7 +57,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -76,7 +76,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -95,7 +95,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -114,7 +114,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -133,7 +133,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Long>() {
             @Override
-            public Long value()
+            public Long getValue()
             {
                 try
                 {
@@ -152,7 +152,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {
@@ -171,7 +171,7 @@ public final class MemorySource extends InteligenceSource
     {
         return new Gauge<Double>() {
             @Override
-            public Double value()
+            public Double getValue()
             {
                 try
                 {

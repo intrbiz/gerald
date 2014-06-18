@@ -3,25 +3,39 @@ package com.intrbiz.gerald.polyakov;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
+import com.codahale.metrics.Metric;
 
-
+/**
+ * A parcel of metrics from a source
+ */
 public class Parcel
 {
     private Node node;
-    
-    private Map<MetricName,Metric> metrics = new HashMap<MetricName,Metric>();
-    
+
+    private String source;
+
+    private Map<String, Metric> metrics = new HashMap<String, Metric>();
+
     public Parcel()
     {
         super();
     }
-    
-    public Parcel(Node node)
+
+    public Parcel(Node node, String source)
     {
         this();
         this.node = node;
+        this.source = source;
+    }
+
+    public String getSource()
+    {
+        return source;
+    }
+
+    public void setSource(String source)
+    {
+        this.source = source;
     }
 
     public Node getNode()
@@ -34,17 +48,17 @@ public class Parcel
         this.node = node;
     }
 
-    public Map<MetricName, Metric> getMetrics()
+    public Map<String, Metric> getMetrics()
     {
         return metrics;
     }
 
-    public void setMetrics(Map<MetricName, Metric> metrics)
+    public void setMetrics(Map<String, Metric> metrics)
     {
         this.metrics = metrics;
     }
-    
-    public void addMetric(MetricName name, Metric metric)
+
+    public void addMetric(String name, Metric metric)
     {
         this.metrics.put(name, metric);
     }

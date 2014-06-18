@@ -15,6 +15,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import com.intrbiz.gerald.polyakov.Parcel;
 import com.intrbiz.gerald.polyakov.Transport;
@@ -23,6 +24,8 @@ import com.intrbiz.util.Option;
 @SuppressWarnings("deprecation")
 public abstract class AbstractHTTPTransport implements Transport
 {
+    private Logger logger = Logger.getLogger(AbstractHTTPTransport.class);
+    
     private String to;
 
     private HttpClient httpClient;
@@ -81,7 +84,7 @@ public abstract class AbstractHTTPTransport implements Transport
         // body
         try
         {
-            System.out.println("Posting to " + url);
+            logger.debug("Posting to " + url);
             post.setEntity(this.createEntity(parcel));
             HttpResponse res = this.httpClient.execute(post, new BasicHttpContext());
             int code = res.getStatusLine().getStatusCode();

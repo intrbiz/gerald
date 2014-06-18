@@ -1,152 +1,88 @@
 package com.intrbiz.gerald.sources;
 
-import java.lang.Thread.State;
-import java.util.Map;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.intrbiz.gerald.source.AbstractIntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
-import com.intrbiz.gerald.InteligenceSource;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.VirtualMachineMetrics;
-
-public class JVMSource extends InteligenceSource
+public class JVMSource extends AbstractIntelligenceSource
 {
     public JVMSource()
     {
         super("Java Metrics");
     }
     
-    public void register(MetricsRegistry registry)
+    public void register(MetricRegistry registry)
     {
         this.registerJVMMetrics(registry);
         this.registerMemoryMetrics(registry);
         this.registerThreadMetrics(registry);
     }
     
-    protected void registerThreadMetrics(MetricsRegistry registry)
+    protected void registerThreadMetrics(MetricRegistry registry)
     {
-        final VirtualMachineMetrics vmm = VirtualMachineMetrics.getInstance();
-        //
-        registry.newGauge(JVMSource.class, "daemon-thread-count", new Gauge<Integer>(){
-            @Override
-            public Integer value()
-            {
-                return vmm.daemonThreadCount();
-            }
-        });
-        for (final Thread.State threadState : Thread.State.values())
-        {
-            registry.newGauge(JVMSource.class, "thread-state-percentage", threadState.toString().toLowerCase(), new Gauge<Double>() {
-                @Override
-                public Double value()
-                {
-                    Map<State, Double> states = vmm.threadStatePercentages();
-                    if (! states.containsKey(threadState)) return 0D;
-                    return states.get(threadState);
-                }
-            });            
-        }
     }
     
-    protected void registerJVMMetrics(MetricsRegistry registry)
+    protected void registerJVMMetrics(MetricRegistry registry)
     {
-        final VirtualMachineMetrics vmm = VirtualMachineMetrics.getInstance();
-        //
-        registry.newGauge(JVMSource.class, "jvm-name", new Gauge<String>(){
+        registry.register(Witchcraft.name(JVMSource.class, "jvm-name"), new Gauge<String>(){
             @Override
-            public String value()
+            public String getValue()
             {
-                return vmm.name();
+                return System.getProperty("java.vendor");
             }
         });
-        registry.newGauge(JVMSource.class, "jvm-version", new Gauge<String>(){
+        registry.register(Witchcraft.name(JVMSource.class, "jvm-version"), new Gauge<String>(){
             @Override
-            public String value()
+            public String getValue()
             {
-                return vmm.version();
+                return System.getProperty("java.version");
             }
         });
-        registry.newGauge(JVMSource.class, "uptime", new Gauge<Long>(){
+        registry.register(Witchcraft.name(JVMSource.class, "os-arch"), new Gauge<String>(){
             @Override
-            public Long value()
+            public String getValue()
             {
-                return vmm.uptime();
+                return System.getProperty("os.arch");
+            }
+        });
+        registry.register(Witchcraft.name(JVMSource.class, "os-name"), new Gauge<String>(){
+            @Override
+            public String getValue()
+            {
+                return System.getProperty("os.name");
+            }
+        });
+        registry.register(Witchcraft.name(JVMSource.class, "os-version"), new Gauge<String>(){
+            @Override
+            public String getValue()
+            {
+                return System.getProperty("os.version");
             }
         });
     }
     
-    protected void registerMemoryMetrics(MetricsRegistry registry)
+    protected void registerMemoryMetrics(MetricRegistry registry)
     {
-        final VirtualMachineMetrics vmm = VirtualMachineMetrics.getInstance();
-        //
-        registry.newGauge(JVMSource.class, "heap-init", new Gauge<Long>(){
+        registry.register(Witchcraft.name(JVMSource.class, "memory-free"), new Gauge<Long>(){
             @Override
-            public Long value()
+            public Long getValue()
             {
-                return (long) vmm.heapInit();
+                return (long) Runtime.getRuntime().freeMemory();
             }
         });
-        registry.newGauge(JVMSource.class, "heap-committed", new Gauge<Long>(){
+        registry.register(Witchcraft.name(JVMSource.class, "memory-max"), new Gauge<Long>(){
             @Override
-            public Long value()
+            public Long getValue()
             {
-                return (long) vmm.heapCommitted();
+                return (long) Runtime.getRuntime().maxMemory();
             }
         });
-        registry.newGauge(JVMSource.class, "heap-max", new Gauge<Long>(){
+        registry.register(Witchcraft.name(JVMSource.class, "memory-total"), new Gauge<Long>(){
             @Override
-            public Long value()
+            public Long getValue()
             {
-                return (long) vmm.heapMax();
-            }
-        });
-        registry.newGauge(JVMSource.class, "heap-used", new Gauge<Long>(){
-            @Override
-            public Long value()
-            {
-                return (long) vmm.heapUsed();
-            }
-        });
-        registry.newGauge(JVMSource.class, "heap-usage", new Gauge<Double>(){
-            @Override
-            public Double value()
-            {
-                return vmm.heapUsage();
-            }
-        });
-        registry.newGauge(JVMSource.class, "non-heap-usage", new Gauge<Double>(){
-            @Override
-            public Double value()
-            {
-                return (double) vmm.nonHeapUsage();
-            }
-        });
-        //
-        registry.newGauge(JVMSource.class, "total-init", new Gauge<Long>(){
-            @Override
-            public Long value()
-            {
-                return (long) vmm.totalInit();
-            }
-        });
-        registry.newGauge(JVMSource.class, "total-committed", new Gauge<Long>(){
-            @Override
-            public Long value()
-            {
-                return (long) vmm.totalCommitted();
-            }
-        });
-        registry.newGauge(JVMSource.class, "total-max", new Gauge<Long>(){
-            @Override
-            public Long value()
-            {
-                return (long) vmm.totalMax();
-            }
-        });
-        registry.newGauge(JVMSource.class, "total-used", new Gauge<Long>(){
-            @Override
-            public Long value()
-            {
-                return (long) vmm.totalUsed();
+                return (long) Runtime.getRuntime().totalMemory();
             }
         });
     }
