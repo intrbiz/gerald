@@ -197,4 +197,37 @@ public class Parcel
         }
         return null;
     }
+    
+    public static Parcel decode(String json)
+    {
+        try
+        {
+            ObjectMapper factory = new ObjectMapper();
+            //
+            factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+            factory.configure(SerializationFeature.INDENT_OUTPUT, true);
+            //
+            factory.registerSubtypes(
+                Node.class,
+                Parcel.class,
+                CounterReading.class,
+                MeterReading.class,
+                TimerReading.class,
+                HistogramReading.class,
+                StringGaugeReading.class,
+                LongGaugeReading.class,
+                IntegerGaugeReading.class,
+                DoubleGaugeReading.class,
+                FloatGaugeReading.class,
+                BooleanGaugeReading.class
+            );
+            //
+            return factory.readValue(json, Parcel.class);
+        }
+        catch (Exception e)
+        {
+        }
+        return null;
+    }
 }
