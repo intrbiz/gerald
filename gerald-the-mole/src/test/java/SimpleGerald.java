@@ -18,9 +18,9 @@ public class SimpleGerald
         // setup Gerald to report
         Gerald.theMole()
             .source(new JVMSource())
-            .lamplighter()
+            .lamplighter("some_key")
             .from(Node.service("SimpleGerald"))
-            .period(10, TimeUnit.SECONDS)
+            .period(30, TimeUnit.SECONDS)
             .courierTo("ws://127.0.0.1:8825/websocket")
             .start();
     }
