@@ -20,8 +20,8 @@ public class SimpleGerald
             .source(new JVMSource())
             .lamplighter()
             .from(Node.service("SimpleGerald"))
-            .period(5, TimeUnit.MINUTES)
-            .courierTo("http://hub.lamplighter/receive")
+            .period(10, TimeUnit.SECONDS)
+            .courierTo("ws://127.0.0.1:8825/websocket")
             .start();
     }
 }

@@ -4,11 +4,12 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.gerald.polyakov.MetricFilter;
 import com.intrbiz.gerald.polyakov.Node;
+import com.intrbiz.gerald.polyakov.Option;
 import com.intrbiz.gerald.polyakov.Polyakov;
 import com.intrbiz.gerald.polyakov.Transport;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
-import com.intrbiz.util.Option;
+import com.intrbiz.gerald.witchcraft.WitchcraftListener;
 
 /**
  * Gerald the mole!
@@ -36,12 +37,16 @@ public final class Gerald
         super();
         this.courier = new Polyakov();
         this.witchcraft = Witchcraft.get();
-        this.witchcraft.addRegisterListener((src) ->
+        this.witchcraft.addRegisterListener(new WitchcraftListener()
         {
-            if (started)
+            @Override
+            public void onAdded(IntelligenceSource src)
             {
-                courier.source(src);
-                src.start();
+                if (started)
+                {
+                    courier.source(src);
+                    src.start();
+                }
             }
         });
     }

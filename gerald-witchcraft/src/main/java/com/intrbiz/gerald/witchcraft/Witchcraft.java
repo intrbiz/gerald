@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.codahale.metrics.MetricRegistry;
 import com.intrbiz.gerald.source.DefaultIntelligenceSource;
@@ -29,7 +27,7 @@ public class Witchcraft
     
     private final ConcurrentMap<String, IntelligenceSource> sources = new ConcurrentHashMap<String, IntelligenceSource>();
     
-    private final List<Consumer<IntelligenceSource>> registerListeners = new CopyOnWriteArrayList<Consumer<IntelligenceSource>>();
+    private final List<WitchcraftListener> registerListeners = new CopyOnWriteArrayList<WitchcraftListener>();
     
     private Witchcraft()
     {
@@ -39,7 +37,7 @@ public class Witchcraft
     /**
      * Listen to registration events
      */
-    public void addRegisterListener(Consumer<IntelligenceSource> listener)
+    public void addRegisterListener(WitchcraftListener listener)
     {
         this.registerListeners.add(listener);
     }
@@ -47,7 +45,7 @@ public class Witchcraft
     /**
      * Stop listening to registration events
      */
-    public void removeRegisterListener(Consumer<IntelligenceSource> listener)
+    public void removeRegisterListener(WitchcraftListener listener)
     {
         this.registerListeners.remove(listener);
     }
@@ -70,9 +68,9 @@ public class Witchcraft
         if (existing != null) throw new IllegalArgumentException("The source " + source.getName() + " already exists!");
         if (existing == null)
         {
-            for (Consumer<IntelligenceSource> listener : this.registerListeners)
+            for (WitchcraftListener listener : this.registerListeners)
             {
-                listener.accept(source);
+                listener.onAdded(source);
             }
         }
         return this;
@@ -83,19 +81,18 @@ public class Witchcraft
      */
     public IntelligenceSource source(String name)
     {
-        return this.source(name, DefaultIntelligenceSource::new);
+        return this.source(new DefaultIntelligenceSource(name));
     }
     
     @SuppressWarnings("unchecked")
-    public <T extends IntelligenceSource> T source(String name, Function<String, T> newSource)
+    public <T extends IntelligenceSource> T source(T source)
     {
-        T source = newSource.apply(name);
-        IntelligenceSource existing = this.sources.putIfAbsent(name, source);
+        IntelligenceSource existing = this.sources.putIfAbsent(source.getName(), source);
         if (existing == null)
         {
-            for (Consumer<IntelligenceSource> listener : this.registerListeners)
+            for (WitchcraftListener listener : this.registerListeners)
             {
-                listener.accept(source);
+                listener.onAdded(source);
             }
             return source;
         }

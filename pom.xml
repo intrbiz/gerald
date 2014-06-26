@@ -24,6 +24,7 @@
     <module>gerald-system-source</module>
     <module>gerald-ping-source</module>
     <module>gerald-witchcraft</module>
+    <module>polyakov-model</module>
   </modules>
 	
 	<build>
@@ -33,8 +34,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -73,16 +74,6 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.10</version>
-			</dependency>
-			<dependency>
-				<groupId>com.yammer.metrics</groupId>
-				<artifactId>metrics-core</artifactId>
-				<version>2.2.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.intrbiz.core</groupId>
-				<artifactId>core</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>

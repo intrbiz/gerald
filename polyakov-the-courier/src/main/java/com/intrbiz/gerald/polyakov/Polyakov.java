@@ -10,9 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Metric;
-import com.intrbiz.gerald.polyakov.transport.LamplighterTransport;
+import com.intrbiz.gerald.polyakov.transport.lamplighter.LamplighterTransport;
 import com.intrbiz.gerald.source.IntelligenceSource;
-import com.intrbiz.util.Option;
 
 /**
  * Polyakov the courier.
@@ -144,6 +143,8 @@ public class Polyakov implements Runnable
         {
             if (this.runner == null)
             {
+                this.transport.start();
+                //
                 this.runner = new Thread(this);
                 this.run = true;
                 this.runner.start();
