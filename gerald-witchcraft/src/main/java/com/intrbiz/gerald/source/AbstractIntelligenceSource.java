@@ -10,6 +10,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 public abstract class AbstractIntelligenceSource implements IntelligenceSource
 {
@@ -112,6 +113,22 @@ public abstract class AbstractIntelligenceSource implements IntelligenceSource
     }
 
     protected abstract void register(MetricRegistry registry);
+    
+    /**
+     * Create a scoped metric name within this source
+     */
+    public String scoped(String name, String scope)
+    {
+        return Witchcraft.name(this.getName(), name, "[" + scope + "]");
+    }
+    
+    /**
+     * Create a metric name within this source
+     */
+    public String name(String... names)
+    {
+        return Witchcraft.name(this.getName(), names);
+    }
 
     @Override
     public void shutdown()
