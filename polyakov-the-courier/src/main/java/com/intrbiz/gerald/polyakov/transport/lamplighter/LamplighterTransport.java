@@ -25,7 +25,7 @@ public class LamplighterTransport implements Transport
     
     private final Timer reconnectTimer;
     
-    private final TimerTask connector;
+    private final Runnable connector;
     
     private Logger logger = Logger.getLogger(LamplighterTransport.class);
 
@@ -40,7 +40,13 @@ public class LamplighterTransport implements Transport
             @Override
             public void onMessage(LamplighterConnection connection, Object message)
             {
-                logger.debug("Got message from Lamplighter StationX: " + message);
+                logger.debug("Got message from Lamplighter: " + message);
+            }
+            
+            @Override
+            public void onConnect(LamplighterConnection connection)
+            {
+                if (logger.isTraceEnabled()) logger.trace("Sucessfully connected to Lamplighter");
             }
 
             @Override
@@ -48,8 +54,17 @@ public class LamplighterTransport implements Transport
             {
                 // schedule a reconnect
                 connection = null;
-                if (logger.isTraceEnabled()) logger.trace("Lamplighter StationX disconnected, scheduling reconnect");
-                reconnectTimer.schedule(connector, 5000L);
+                if (logger.isTraceEnabled()) logger.trace("Lamplighter disconnected, scheduling reconnect");
+                reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, 5000L);
+            }
+            
+            @Override
+            public void onError(LamplighterConnection connection, Throwable error)
+            {
+                // schedule a reconnect
+                connection = null;
+                if (logger.isTraceEnabled()) logger.trace("Lamplighter connection failed, scheduling reconnect");
+                reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, 5000L);
             }
         };
         //
@@ -59,14 +74,14 @@ public class LamplighterTransport implements Transport
             {
                 try
                 {
-                    if (logger.isTraceEnabled()) logger.trace("Connecting to Lamplighter StationX");
+                    if (logger.isTraceEnabled()) logger.trace("Connecting to Lamplighter");
                     connection = LamplighterClient.getDefaultInstance().connect(new URI(url), key, listener);
                 }
                 catch (Exception e)
                 {
-                   logger.warn("Failed to connect to Lamplighter StationX", e);
+                   logger.warn("Failed to connect to Lamplighter", e);
                    // schedule a reconnect
-                   reconnectTimer.schedule(connector, 5000L);
+                   reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, 5000L);
                 }
             }
         };

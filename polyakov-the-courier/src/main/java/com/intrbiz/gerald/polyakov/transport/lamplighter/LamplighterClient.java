@@ -4,6 +4,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -17,9 +18,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.util.concurrent.GenericFutureListener;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 
 import com.intrbiz.gerald.polyakov.Parcel;
@@ -108,7 +107,9 @@ public class LamplighterClient
             Bootstrap b = new Bootstrap()
             .group(group)
             .channel(NioSocketChannel.class)
-            .handler(new ChannelInitializer<SocketChannel>() {
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+            .handler(new ChannelInitializer<SocketChannel>()
+            {
                 @Override
                 protected void initChannel(SocketChannel ch)
                 {
@@ -159,39 +160,6 @@ public class LamplighterClient
         public void close()
         {
             if (this.channel.isActive()) this.channel.close();
-        }
-    }
-    
-    
-    public static void main(String[] args) throws Exception
-    {
-        LamplighterClient client = new LamplighterClient();
-        // connect
-        LamplighterConnection con = client.connect(new URI("ws://127.0.0.1:8825/websocket"), "test", new LamplighterListener() {
-            @Override
-            public void onMessage(LamplighterConnection connection, Object message)
-            {
-                System.out.println("Got message: " + message);
-            }
-        });
-        // do shit
-        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-        while (true)
-        {
-            String msg = console.readLine();
-            if (msg == null)
-            {
-                break;
-            }
-            else if ("bye".equals(msg.toLowerCase()))
-            {
-                con.close();
-                break;
-            }
-            else
-            {
-                con.send(msg);
-            }
         }
     }
 }
