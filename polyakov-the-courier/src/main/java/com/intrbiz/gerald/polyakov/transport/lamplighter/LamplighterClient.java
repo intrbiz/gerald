@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import com.intrbiz.gerald.polyakov.Parcel;
+import com.intrbiz.gerald.polyakov.io.PolyakovTranscoder;
 import com.intrbiz.gerald.polyakov.transport.lamplighter.netty.LamplighterClientHandler;
 
 public class LamplighterClient
@@ -83,6 +84,8 @@ public class LamplighterClient
         private LamplighterClientHandler handler;
         
         private Channel channel;
+        
+        private PolyakovTranscoder transcoder = new PolyakovTranscoder();
         
         public DefaultLamplighterConnection(LamplighterListener listener)
         {
@@ -152,7 +155,7 @@ public class LamplighterClient
             // encode parcel to JSON
             if (message instanceof Parcel)
             {
-                this.channel.writeAndFlush(new TextWebSocketFrame(Parcel.encode((Parcel) message)));
+                this.channel.writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message)));
             }
         }
 

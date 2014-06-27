@@ -17,9 +17,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrbiz.gerald.polyakov.gauge.BooleanGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.FloatGaugeReading;
@@ -161,73 +158,5 @@ public class Parcel
                 this.addReading(new BooleanGaugeReading(name, (Gauge<Boolean>) metric));
             }
         }
-    }
-    
-    //
-    
-    public static String encode(Parcel parcel)
-    {
-        try
-        {
-            ObjectMapper factory = new ObjectMapper();
-            //
-            factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-            factory.configure(SerializationFeature.INDENT_OUTPUT, true);
-            //
-            factory.registerSubtypes(
-                Node.class,
-                Parcel.class,
-                CounterReading.class,
-                MeterReading.class,
-                TimerReading.class,
-                HistogramReading.class,
-                StringGaugeReading.class,
-                LongGaugeReading.class,
-                IntegerGaugeReading.class,
-                DoubleGaugeReading.class,
-                FloatGaugeReading.class,
-                BooleanGaugeReading.class
-            );
-            //
-            return factory.writeValueAsString(parcel);
-        }
-        catch (Exception e)
-        {
-        }
-        return null;
-    }
-    
-    public static Parcel decode(String json)
-    {
-        try
-        {
-            ObjectMapper factory = new ObjectMapper();
-            //
-            factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-            factory.configure(SerializationFeature.INDENT_OUTPUT, true);
-            //
-            factory.registerSubtypes(
-                Node.class,
-                Parcel.class,
-                CounterReading.class,
-                MeterReading.class,
-                TimerReading.class,
-                HistogramReading.class,
-                StringGaugeReading.class,
-                LongGaugeReading.class,
-                IntegerGaugeReading.class,
-                DoubleGaugeReading.class,
-                FloatGaugeReading.class,
-                BooleanGaugeReading.class
-            );
-            //
-            return factory.readValue(json, Parcel.class);
-        }
-        catch (Exception e)
-        {
-        }
-        return null;
     }
 }
