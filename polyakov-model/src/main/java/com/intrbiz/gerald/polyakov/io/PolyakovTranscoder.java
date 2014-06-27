@@ -52,7 +52,17 @@ public class PolyakovTranscoder
         return this.factory.writeValueAsString(value);
     }
     
+    public byte[] encodeAsBytes(Object value) throws IOException
+    {
+        return this.factory.writeValueAsBytes(value);
+    }
+    
     public <T> T decodeFromString(String json, Class<T> type) throws IOException
+    {
+        return this.factory.readValue(json, type);
+    }
+    
+    public <T> T decodeFromBytes(byte[] json, Class<T> type) throws IOException
     {
         return this.factory.readValue(json, type);
     }
