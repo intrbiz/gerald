@@ -60,6 +60,18 @@ public final class Gerald
         return this;
     }
     
+    public Gerald from()
+    {
+        this.courier.from(Node.service());
+        return this;
+    }
+    
+    public Gerald from(String service)
+    {
+        this.courier.from(Node.service(service));
+        return this;
+    }
+    
     public Gerald courierTo(String url)
     {
         courier.courierTo(url);

@@ -53,6 +53,28 @@ public class Polyakov
         this.node = node;
         return this;
     }
+    
+    /**
+     * Setup our node identifier using available system properties 
+     * and information we can gather.
+     * 
+     * See Node.service()
+     * 
+     */
+    public Polyakov from()
+    {
+        return this.from(Node.service());
+    }
+    
+    /**
+     * Setup our node identifier using available system properties 
+     * and the given service name
+     */
+    public Polyakov from(String service)
+    {
+        this.from(Node.service(service));
+        return this;
+    }
 
     /**
      * Add a source for Polyakov to courier
@@ -166,9 +188,9 @@ public class Polyakov
      */
     public void start()
     {
-        // sanity checks
-        if (this.node == null) throw new RuntimeException("Polyakov needs an identity");
-        if (this.transport == null) throw new RuntimeException("Polyakov needs a transport");
+        // sane defaults
+        if (this.node == null) this.from();
+        if (this.transport == null) this.lamplighter();
         // start
         synchronized (this)
         {
