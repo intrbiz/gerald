@@ -8,6 +8,7 @@ import com.intrbiz.gerald.polyakov.Option;
 import com.intrbiz.gerald.polyakov.Polyakov;
 import com.intrbiz.gerald.polyakov.Transport;
 import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.sources.JVMSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.gerald.witchcraft.WitchcraftListener;
 
@@ -49,6 +50,8 @@ public final class Gerald
                 }
             }
         });
+        // default sources
+        this.source(new JVMSource());
     }
     
     public Gerald from(Node node)
