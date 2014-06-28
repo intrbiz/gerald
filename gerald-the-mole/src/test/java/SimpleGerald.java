@@ -1,4 +1,6 @@
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -12,6 +14,6 @@ public class SimpleGerald
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         // setup Gerald to report
-        Gerald.theMole().start();
+        Gerald.theMole().period(10, TimeUnit.SECONDS).start();
     }
 }
