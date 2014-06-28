@@ -13,10 +13,49 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.gerald.witchcraft.WitchcraftListener;
 
 /**
- * Gerald the mole!
- * 
- * Collecting all your most secret metrics and exposing them.
- *  
+ * <p>
+ * Gerald the mole! Collecting and reporting your application's 
+ * metrics.
+ * </p><p>
+ * Gerald collects metrics about your application, these metrics 
+ * can cover: performance, errors, etc.  Allowing your application 
+ * to be monitored in great depth.
+ * </p><p>
+ * Gerald, with the help of Polyakov publishes the gathered 
+ * application metrics to a collection hub.  Polyakov is most often 
+ * used in conjunction with Lamplighter to collect application metrics.
+ * </p><p>
+ * It is pretty simple to get Gerald up and running and doing his 
+ * digging:
+ * </p>
+ * <code>
+ *   Gerald.theMole().start();
+ * </code>
+ * <p>
+ * Would start Gerald using the default, auto detected configuration, 
+ * for specific setups use the fluent interface that Gerald provides 
+ * to alter his activities.
+ * </p>
+ * <p>
+ * Gerald will make use of the following system properties by default:
+ * </p>
+ * <ul>
+ *   <li>
+ *      <strong>gerald.host.name</strong> - override the host name of this node
+ *   </li>
+ *   <li>
+ *      <strong>gerald.host.id</strong> - override the host UUID of this node, otherwise the file /etc/gerald.host.id is tried
+ *   </li>
+ *   <li>
+ *      <strong>gerald.service</strong> - the service name for this application, unless explicit set by the application
+ *   </li>
+ *   <li>
+ *      <strong>lamplighter.host</strong> - override the Lamplighter host to publish too
+ *   </li>
+ *   <li>
+ *      <strong>lamplighter.key</strong> - the key to use when authenticating with Lamplighter
+ *   </li>
+ * </ul>
  */
 public final class Gerald
 {
@@ -54,48 +93,77 @@ public final class Gerald
         this.source(new JVMSource());
     }
     
+    /**
+     * Set the identifier of this node
+     */
     public Gerald from(Node node)
     {
         this.courier.from(node);
         return this;
     }
     
+    /**
+     * Auto detect our node identifier
+     */
     public Gerald from()
     {
         this.courier.from(Node.service());
         return this;
     }
     
+    /**
+     * Set our node identifier using the given service name and 
+     * auto detecting the host identifier
+     * @param service the service name to use
+     */
     public Gerald from(String service)
     {
         this.courier.from(Node.service(service));
         return this;
     }
     
+    /**
+     * Set URL to where metrics will be sent
+     */
     public Gerald courierTo(String url)
     {
         courier.courierTo(url);
         return this;
     }
-
+    
+    /**
+     * Add a filter to restrict what metrics will be 
+     * revealed
+     */
     public Gerald filter(MetricFilter filter)
     {
         courier.filter(filter);
         return this;
     }
 
+    /**
+     * Set the transport protocol which will be used 
+     * to send metrics
+     */
     public Gerald transport(Transport t)
     {
         courier.transport(t);
         return this;
     }
     
+    /**
+     * Send metrics to Lamplighter auto detecting the 
+     * required configuration
+     */
     public Gerald lamplighter()
     {
         this.courier.lamplighter();
         return this;
     }
     
+    /**
+     * Send metrics to Lamplighter using the given key
+     */
     public Gerald lamplighter(String lamplighterKey)
     {
         this.courier.lamplighter(lamplighterKey);
@@ -138,17 +206,26 @@ public final class Gerald
         return this;
     }
 
+    /**
+     * Set how often metrics should be reported
+     */
     public Gerald period(long period, TimeUnit unit)
     {
         courier.period(period, unit);
         return this;
     }
     
+    /**
+     * Get the registry of intelligence sources (metrics registers)
+     */
     public Witchcraft witchcraft()
     {
         return this.witchcraft;
     }
     
+    /**
+     * Register an intelligence source with Gerald which will be revealed
+     */
     public Gerald source(IntelligenceSource source)
     {
         this.witchcraft.register(source);
