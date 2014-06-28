@@ -19,7 +19,7 @@ import com.intrbiz.gerald.source.IntelligenceSource;
  * Periodically collate, package and courier your metrics.
  * 
  */
-public class Polyakov implements Runnable
+public class Polyakov
 {
     protected Set<IntelligenceSource> sources = new HashSet<IntelligenceSource>();
 
@@ -44,47 +44,72 @@ public class Polyakov implements Runnable
         super();
     }
     
+    /**
+     * The identifier of this node that Polyakov will use when 
+     * communicating with his masters
+     */
     public Polyakov from(Node node)
     {
         this.node = node;
         return this;
     }
 
+    /**
+     * Add a source for Polyakov to courier
+     */
     public Polyakov source(IntelligenceSource source)
     {
         this.sources.add(source);
         return this;
     }
 
+    /**
+     * Add a filter restricting what Polyakov will courier
+     */
     public Polyakov filter(MetricFilter filter)
     {
         this.filters.add(filter);
         return this;
     }
 
+    /**
+     * Tell Polyakov what protocol will be used to transport 
+     * the parcels
+     */
     public Polyakov transport(Transport t)
     {
         this.transport = t;
         return this;
     }
     
-    // out the box transports
-    
+    /**
+     * Tell Polyakov to send parcels to Lamplighter.
+     * 
+     * The lamplighter key is set by the "lamplighter.key" system property 
+     * and the lamplighter host is set by the "lamplighter.host" system property.
+     * 
+     */
     public Polyakov lamplighter()
     {
-        this.transport = new LamplighterTransport();
+        this.lamplighter(System.getProperty("lamplighter.key"));
+        this.courierTo(System.getProperty("lamplighter.key", "ws://127.0.0.1:8825/listen"));
         return this;
     }
     
+    /**
+     * Tell Polyakov to use Lamplighter for parcel transport using the given key
+     * @param lamplighterKey the key to use when authenticating with Lamplighter
+     */
     public Polyakov lamplighter(String lamplighterKey)
     {
         this.transport = new LamplighterTransport();
         this.transport.option(LamplighterTransport.LAMPLIGHTER_KEY, lamplighterKey);
         return this;
     }
-    
-    //
 
+    /**
+     * Where should Polyakov send parcels too
+     */
     public Polyakov courierTo(String url)
     {
         this.transport.to(url);
@@ -127,12 +152,18 @@ public class Polyakov implements Runnable
         return this;
     }
 
+    /**
+     * How often should Polyakov transport parcels
+     */
     public Polyakov period(long period, TimeUnit unit)
     {
         this.period = unit.toMillis(period);
         return this;
     }
 
+    /**
+     * Start Polyakov!
+     */
     public void start()
     {
         // sanity checks
@@ -145,7 +176,10 @@ public class Polyakov implements Runnable
             {
                 this.transport.start();
                 //
-                this.runner = new Thread(this);
+                this.runner = new Thread(new Runnable()
+                { 
+                    public void run() { Polyakov.this.run(); } 
+                }, "Polyakov " + this.node);
                 this.run = true;
                 this.runner.start();
             }
@@ -161,6 +195,9 @@ public class Polyakov implements Runnable
         }
     }
 
+    /**
+     * Request Polyakov to send all parcels out of schedule as soon as possible
+     */
     public void sendNow()
     {
         synchronized (this)
@@ -170,7 +207,7 @@ public class Polyakov implements Runnable
         }
     }
 
-    public void run()
+    protected void run()
     {
         // sleep
         this.sleep();
