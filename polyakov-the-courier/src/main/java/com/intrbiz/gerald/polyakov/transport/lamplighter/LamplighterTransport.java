@@ -28,6 +28,8 @@ public class LamplighterTransport implements Transport
     private final Runnable connector;
     
     private Logger logger = Logger.getLogger(LamplighterTransport.class);
+    
+    private long reconnectDelay = 5000L;
 
     public LamplighterTransport()
     {
@@ -46,7 +48,8 @@ public class LamplighterTransport implements Transport
             @Override
             public void onConnect(LamplighterConnection connection)
             {
-                if (logger.isTraceEnabled()) logger.trace("Sucessfully connected to Lamplighter");
+                if (logger.isDebugEnabled()) logger.debug("Sucessfully connected to Lamplighter");
+                reconnectDelay = 5000L;
             }
 
             @Override
@@ -54,34 +57,31 @@ public class LamplighterTransport implements Transport
             {
                 // schedule a reconnect
                 connection = null;
-                if (logger.isTraceEnabled()) logger.trace("Lamplighter disconnected, scheduling reconnect");
-                reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, 5000L);
-            }
-            
-            @Override
-            public void onError(LamplighterConnection connection, Throwable error)
-            {
-                // schedule a reconnect
-                connection = null;
-                if (logger.isTraceEnabled()) logger.trace("Lamplighter connection failed, scheduling reconnect");
-                reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, 5000L);
+                if (logger.isDebugEnabled()) logger.debug("Lamplighter disconnected, scheduling reconnect");
+                reconnectDelay = reconnectDelay < 300000L ? reconnectDelay * 2L : reconnectDelay;
+                if (logger.isDebugEnabled()) logger.debug("Scheduling reconnect in: " + reconnectDelay + "ms");
+                reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, reconnectDelay);
             }
         };
         //
-        this.connector = new TimerTask()
+        this.connector = new Runnable()
         {
             public void run()
             {
                 try
                 {
-                    if (logger.isTraceEnabled()) logger.trace("Connecting to Lamplighter");
+                    if (logger.isDebugEnabled()) logger.debug("Connecting to Lamplighter");
                     connection = LamplighterClient.getDefaultInstance().connect(new URI(url), key, listener);
                 }
                 catch (Exception e)
                 {
-                   logger.warn("Failed to connect to Lamplighter", e);
+                   logger.debug("Failed to connect to Lamplighter", e);
+                   // reset state
+                   connection = null;
                    // schedule a reconnect
-                   reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, 5000L);
+                   reconnectDelay = reconnectDelay < 300000L ? reconnectDelay * 2L : reconnectDelay;
+                   if (logger.isDebugEnabled()) logger.debug("Scheduling reconnect in: " + reconnectDelay + "ms");
+                   reconnectTimer.schedule(new TimerTask() { public void run() { connector.run(); } }, reconnectDelay);
                 }
             }
         };

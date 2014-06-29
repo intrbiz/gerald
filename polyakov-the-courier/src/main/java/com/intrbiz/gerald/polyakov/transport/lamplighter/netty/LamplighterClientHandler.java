@@ -87,8 +87,8 @@ public class LamplighterClientHandler extends SimpleChannelInboundHandler<Object
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
-        if (logger.isTraceEnabled()) logger.trace("Error communicating with Lamplighter StationX");
+        if (logger.isTraceEnabled()) logger.trace("Error communicating with Lamplighter StationX, closing connection");
         if (this.listener != null) this.listener.onError(this.connection, cause);
-        ctx.close();
+        ctx.channel().close();
     }
 }
