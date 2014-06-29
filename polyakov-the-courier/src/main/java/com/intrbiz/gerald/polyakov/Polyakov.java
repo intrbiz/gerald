@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Metric;
+import com.intrbiz.gerald.polyakov.transport.lamplighter.LamplighterClient;
 import com.intrbiz.gerald.polyakov.transport.lamplighter.LamplighterTransport;
 import com.intrbiz.gerald.source.IntelligenceSource;
 
@@ -107,19 +108,35 @@ public class Polyakov
     /**
      * Tell Polyakov to send parcels to Lamplighter.
      * 
-     * The lamplighter key is set by the "lamplighter.key" system property 
-     * and the lamplighter host is set by the "lamplighter.host" system property.
+     * The Lamplighter key is determined by:
+     * 
+     *   1. Using the "lamplighter.key" system property to 
+     *      determine the file containing the key to use
+     *      
+     *   2. Reading the key from /etc/lamplighter.key
+     * 
+     * The Lamplighter key is determined by:
+     * 
+     *   1. Using the value of "lamplighter.host" system property
+     *   
+     *   2. Using the following hosts within the configured search domains:
+     *      a. "stationx.lamplighter"
+     *      b. "stationx"
+     *      c. "lamplighter"
+     *   
+     *   3. Defaulting to "ws://127.0.0.1/stationx"
      * 
      */
     public Polyakov lamplighter()
     {
-        this.lamplighter(System.getProperty("lamplighter.key"));
-        this.courierTo(System.getProperty("lamplighter.key", "ws://127.0.0.1:8825/listen"));
+        this.lamplighter(LamplighterClient.getLamplighterKey());
+        this.courierTo(LamplighterClient.getLamplighterHost());
         return this;
     }
     
     /**
-     * Tell Polyakov to use Lamplighter for parcel transport using the given key
+     * Tell Polyakov to use Lamplighter for parcel transport using the given key,
+     * Note: remember to set where to courier to.
      * @param lamplighterKey the key to use when authenticating with Lamplighter
      */
     public Polyakov lamplighter(String lamplighterKey)

@@ -152,8 +152,26 @@ public final class Gerald
     }
     
     /**
-     * Send metrics to Lamplighter auto detecting the 
-     * required configuration
+     * Send metrics to Lamplighter.
+     * 
+     * The Lamplighter key is determined by:
+     * 
+     *   1. Using the "lamplighter.key" system property to 
+     *      determine the file containing the key to use
+     *      
+     *   2. Reading the key from /etc/lamplighter.key
+     * 
+     * The Lamplighter key is determined by:
+     * 
+     *   1. Using the value of "lamplighter.host" system property
+     *   
+     *   2. Using the following hosts within the configured search domains:
+     *      a. "stationx.lamplighter"
+     *      b. "stationx"
+     *      c. "lamplighter"
+     *   
+     *   3. Defaulting to "ws://127.0.0.1/stationx"
+     * 
      */
     public Gerald lamplighter()
     {
@@ -162,7 +180,8 @@ public final class Gerald
     }
     
     /**
-     * Send metrics to Lamplighter using the given key
+     * Send metrics to Lamplighter using the given key,
+     * Note: remember to set where metrics should be sent to
      */
     public Gerald lamplighter(String lamplighterKey)
     {
