@@ -30,20 +30,24 @@ public class Node
     @JsonProperty("host_name")
     private String hostName;
 
-    @JsonProperty("service")
-    private String service;
+    @JsonProperty("service_id")
+    private UUID serviceId;
+
+    @JsonProperty("service_name")
+    private String serviceName;
 
     public Node()
     {
         super();
     }
 
-    public Node(UUID hostId, String hostName, String service)
+    public Node(UUID hostId, String hostName, UUID serviceId, String serviceName)
     {
         super();
         this.hostId = hostId;
         this.hostName = hostName;
-        this.service = service;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
     }
 
     public UUID getHostId()
@@ -56,11 +60,6 @@ public class Node
         return this.hostName;
     }
 
-    public String getService()
-    {
-        return this.service;
-    }
-
     public void setHostId(UUID hostId)
     {
         this.hostId = hostId;
@@ -71,35 +70,45 @@ public class Node
         this.hostName = hostName;
     }
 
-    public void setService(String service)
+    public UUID getServiceId()
     {
-        this.service = service;
+        return serviceId;
+    }
+
+    public void setServiceId(UUID serviceId)
+    {
+        this.serviceId = serviceId;
+    }
+
+    public String getServiceName()
+    {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName)
+    {
+        this.serviceName = serviceName;
     }
 
     public String toString()
     {
-        return "Node(" + this.hostId + ", " + this.hostName + ", " + this.service + ")";
+        return "Node(" + this.hostId + "::" + this.serviceId + "; " + this.hostName + ", " + this.serviceName + ")";
     }
-    
+
     // factories
-    
+
     public static final String SYSTEM_SERVICE = "System";
 
     /**
-     * Construct a node identifier with the given service name and 
-     * auto-detecting the host name and id.
+     * Construct a node identifier with the given service name and auto-detecting the host name and id.
      * 
-     * The host name is determined by:
-     *   1. The system property "gerald.host.name"
-     *   2. The local host name
-     *   
-     * The host UUID is determined by:
-     *   1. The system property "gerals.host.id"
-     *   2. The file /etc/gerald.host.id
-     *   3. Randomly generated
+     * The host name is determined by: 1. The system property "gerald.host.name" 2. The local host name
+     * 
+     * The host UUID is determined by: 1. The system property "gerals.host.id" 2. The file /etc/gerald.host.id 3. Randomly generated
      * 
      * 
-     * @param service the service name
+     * @param service
+     *            the service name
      */
     public static Node service(String service)
     {
@@ -127,18 +136,14 @@ public class Node
             hostId = UUID.randomUUID().toString();
             Logger.getLogger(Node.class).warn("Generating random host UUID, please consider setting the property: gerald.host.id or creating the file /etc/gerald.host.id");
         }
-        //
-        return new Node(UUID.fromString(hostId), hostName, service);
+        // the service id is always unique
+        return new Node(UUID.fromString(hostId), hostName, UUID.randomUUID(), service);
     }
 
     /**
-     * Construct a node identifier by auto-detecting the service name,
-     * the host name and host id.
+     * Construct a node identifier by auto-detecting the service name, the host name and host id.
      * 
-     * The service name is determined by:
-     *   1. The "gerald.service" system property
-     *   2. The PID (on Linux)
-     *   3. The JMX Runtime name as taken from RuntimeMXBean
+     * The service name is determined by: 1. The "gerald.service" system property 2. The PID (on Linux) 3. The JMX Runtime name as taken from RuntimeMXBean
      * 
      * @return
      */
@@ -166,16 +171,16 @@ public class Node
     }
 
     /**
-     * Construct a node identifier using the system service name.
-     * Note: You shouldn't use this in your application.
+     * Construct a node identifier using the system service name. Note: You shouldn't use this in your application.
      */
     public static Node systemService()
     {
         return service(SYSTEM_SERVICE);
     }
-    
+
     /**
      * Read the value of /etc/gerald.host.id
+     * 
      * @return null if the file does not exist of is invalid
      */
     public static String readSystemHostId()
@@ -186,7 +191,7 @@ public class Node
             if (file.exists())
             {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
-                try 
+                try
                 {
                     String id = reader.readLine();
                     if (id != null) return UUID.fromString(id.trim()).toString();
