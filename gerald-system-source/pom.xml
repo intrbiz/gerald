@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>com.intrbiz.gerald</groupId>
 		<artifactId>gerald</artifactId>
-		<version>1.0.0-rc-1</version>
+		<version>1.0.0-rc-3</version>
 	</parent>
 	<artifactId>gerald-system-source</artifactId>
 	<name>gerald-system-source</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncodin>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
