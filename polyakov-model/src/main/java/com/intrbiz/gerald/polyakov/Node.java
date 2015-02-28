@@ -126,7 +126,7 @@ public class Node
             }
         }
         //
-        String hostId = System.getenv("gerald.host.id");
+        String hostId = System.getProperty("gerald.host.id");
         if (hostId == null || hostId.length() <= 0)
         {
             hostId = readSystemHostId();
