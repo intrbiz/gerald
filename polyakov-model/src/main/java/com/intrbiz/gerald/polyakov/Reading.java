@@ -11,6 +11,9 @@ public abstract class Reading
     @JsonProperty("name")
     private String name;
     
+    @JsonProperty("unit")
+    private String unit;
+    
     public Reading()
     {
         super();
@@ -30,5 +33,15 @@ public abstract class Reading
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getUnit()
+    {
+        return unit;
+    }
+
+    public void setUnit(String unit)
+    {
+        this.unit = unit;
     }
 }
