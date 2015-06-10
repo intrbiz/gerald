@@ -34,6 +34,22 @@ public class LongGaugeReading extends Reading implements ContinuousGaugeReading<
         super(name);
         this.value = metric.getValue();
     }
+    
+    public LongGaugeReading(String name, String unit, Long value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
+    
+    public LongGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
+    {
+        super(name, unit);
+        this.value = value;
+        this.warning = warning;
+        this.critical = critical;
+        this.min = min;
+        this.max = max;
+    }
 
     @Override
     public Long getValue()

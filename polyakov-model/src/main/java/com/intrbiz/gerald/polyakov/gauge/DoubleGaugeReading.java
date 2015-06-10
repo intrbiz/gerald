@@ -34,6 +34,22 @@ public class DoubleGaugeReading extends Reading implements ContinuousGaugeReadin
         super(name);
         this.value = metric.getValue();
     }
+    
+    public DoubleGaugeReading(String name, String unit, Double value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
+    
+    public DoubleGaugeReading(String name, String unit, Double value, Double warning, Double critical, Double min, Double max)
+    {
+        super(name, unit);
+        this.value = value;
+        this.warning = warning;
+        this.critical = critical;
+        this.min = min;
+        this.max = max;
+    }
 
     @Override
     public Double getValue()

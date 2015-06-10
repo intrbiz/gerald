@@ -34,6 +34,22 @@ public class FloatGaugeReading extends Reading implements ContinuousGaugeReading
         super(name);
         this.value = metric.getValue();
     }
+    
+    public FloatGaugeReading(String name, String unit, Float value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
+    
+    public FloatGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
+    {
+        super(name, unit);
+        this.value = value;
+        this.warning = warning;
+        this.critical = critical;
+        this.min = min;
+        this.max = max;
+    }
 
     @Override
     public Float getValue()

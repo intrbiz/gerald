@@ -34,6 +34,22 @@ public class IntegerGaugeReading extends Reading implements ContinuousGaugeReadi
         super(name);
         this.value = metric.getValue();
     }
+    
+    public IntegerGaugeReading(String name, String unit, Integer value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
+    
+    public IntegerGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
+    {
+        super(name, unit);
+        this.value = value;
+        this.warning = warning;
+        this.critical = critical;
+        this.min = min;
+        this.max = max;
+    }
 
     @Override
     public Integer getValue()

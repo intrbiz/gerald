@@ -24,6 +24,12 @@ public abstract class Reading
         super();
         this.name = name;
     }
+    
+    public Reading(String name, String unit)
+    {
+        this(name);
+        this.unit = unit;
+    }
 
     public String getName()
     {
