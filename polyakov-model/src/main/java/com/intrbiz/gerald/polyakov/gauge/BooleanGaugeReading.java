@@ -22,6 +22,12 @@ public class BooleanGaugeReading extends Reading implements GaugeReading<Boolean
         super(name);
         this.value = metric.getValue();
     }
+    
+    public BooleanGaugeReading(String name, String unit, Boolean value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
 
     @Override
     public Boolean getValue()

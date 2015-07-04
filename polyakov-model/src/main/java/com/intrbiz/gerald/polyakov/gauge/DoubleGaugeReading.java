@@ -3,14 +3,26 @@ package com.intrbiz.gerald.polyakov.gauge;
 import com.codahale.metrics.Gauge;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.gerald.polyakov.GaugeReading;
+import com.intrbiz.gerald.polyakov.ContinuousGaugeReading;
 import com.intrbiz.gerald.polyakov.Reading;
 
 @JsonTypeName("double-gauge")
-public class DoubleGaugeReading extends Reading implements GaugeReading<Double>
+public class DoubleGaugeReading extends Reading implements ContinuousGaugeReading<Double>
 {
     @JsonProperty("value")
     private Double value;
+    
+    @JsonProperty("warning")
+    private Double warning;
+    
+    @JsonProperty("critical")
+    private Double critical;
+    
+    @JsonProperty("min")
+    private Double min;
+    
+    @JsonProperty("max")
+    private Double max;
     
     public DoubleGaugeReading()
     {
@@ -21,6 +33,22 @@ public class DoubleGaugeReading extends Reading implements GaugeReading<Double>
     {
         super(name);
         this.value = metric.getValue();
+    }
+    
+    public DoubleGaugeReading(String name, String unit, Double value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
+    
+    public DoubleGaugeReading(String name, String unit, Double value, Double warning, Double critical, Double min, Double max)
+    {
+        super(name, unit);
+        this.value = value;
+        this.warning = warning;
+        this.critical = critical;
+        this.min = min;
+        this.max = max;
     }
 
     @Override
@@ -33,5 +61,53 @@ public class DoubleGaugeReading extends Reading implements GaugeReading<Double>
     public void setValue(Double value)
     {
         this.value = value;
+    }
+
+    @Override
+    public Double getWarning()
+    {
+        return warning;
+    }
+
+    @Override
+    public void setWarning(Double warning)
+    {
+        this.warning = warning;
+    }
+
+    @Override
+    public Double getCritical()
+    {
+        return critical;
+    }
+
+    @Override
+    public void setCritical(Double critical)
+    {
+        this.critical = critical;
+    }
+
+    @Override
+    public Double getMin()
+    {
+        return min;
+    }
+
+    @Override
+    public void setMin(Double min)
+    {
+        this.min = min;
+    }
+
+    @Override
+    public Double getMax()
+    {
+        return max;
+    }
+
+    @Override
+    public void setMax(Double max)
+    {
+        this.max = max;
     }
 }

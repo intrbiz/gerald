@@ -22,6 +22,12 @@ public class StringGaugeReading extends Reading implements GaugeReading<String>
         super(name);
         this.value = metric.getValue();
     }
+    
+    public StringGaugeReading(String name, String unit, String value)
+    {
+        super(name, unit);
+        this.value = value;
+    }
 
     @Override
     public String getValue()

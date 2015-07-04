@@ -3,6 +3,7 @@ package com.intrbiz.gerald.polyakov.io;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrbiz.gerald.polyakov.CounterReading;
@@ -44,6 +45,7 @@ public class PolyakovTranscoder
         this.factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         this.factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         this.factory.configure(SerializationFeature.INDENT_OUTPUT, true);
+        this.factory.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.factory.registerSubtypes(CLASSES);
     }
     
