@@ -5,7 +5,7 @@
 
 	<groupId>com.intrbiz.gerald</groupId>
 	<artifactId>gerald</artifactId>
-	<version>1.0.1</version>
+	<version>1.1.0-RC1</version>
 	<packaging>pom</packaging>
 
 	<name>gerald</name>
@@ -118,7 +118,7 @@
 			<dependency>
 				<groupId>com.intrbiz.gerald</groupId>
 				<artifactId>gerald-the-mole</artifactId>
-				<version>1.0.1</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.intrbiz.3p.sigar</groupId>
@@ -128,12 +128,12 @@
 			<dependency>
 				<groupId>com.intrbiz.gerald</groupId>
 				<artifactId>polyakov-the-courier</artifactId>
-				<version>1.0.1</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.intrbiz.gerald</groupId>
 				<artifactId>gerald-witchcraft</artifactId>
-				<version>1.0.1</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.codahale.metrics</groupId>
@@ -163,7 +163,7 @@
 			<dependency>
 				<groupId>com.intrbiz.gerald</groupId>
 				<artifactId>polyakov-model</artifactId>
-				<version>1.0.1</version>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
