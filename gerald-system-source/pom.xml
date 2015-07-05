@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.intrbiz.gerald</groupId>
 		<artifactId>gerald</artifactId>
-		<version>1.1.0-RC1</version>
+		<version>1.1.0</version>
 	</parent>
 	<artifactId>gerald-system-source</artifactId>
 	<name>gerald-system-source</name>
