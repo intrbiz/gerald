@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.intrbiz.gerald</groupId>
 		<artifactId>gerald</artifactId>
-		<version>1.1.0</version>
+		<version>1.2.0</version>
 	</parent>
 	<artifactId>polyakov-the-courier</artifactId>
 	<name>polyakov-the-courier</name>
