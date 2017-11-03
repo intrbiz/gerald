@@ -1,4 +1,4 @@
-package com.intrbiz.gerald.sources;
+package com.intrbiz.gerald.source;
 
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
